@@ -560,11 +560,11 @@ class PageMain(tk.Frame):
 			assert isinstance(self.vmt, VMTEdit)
 			fl.write(str(VMT(
 					tf2.material,
+					custom_path = custom_export,
 					shader = self.vmt.v_shader.get(),
 					blend_frames = self.vmt.v_blend_frames.get(),
 					depth_blend = self.vmt.v_depth_blend.get(),
 					additive = self.vmt.v_additive.get(),
-					custom_path = custom_export,
 					custom_folder = config.workshop_folder,
 					alpha_test = self.vmt.v_alpha_test.get(),
 					no_cull = self.vmt.v_no_cull.get(),
@@ -639,6 +639,8 @@ class VMTEdit(tk.Frame):
 		self.v_alpha_test = tk.BooleanVar()
 		self.v_no_cull = tk.BooleanVar()
 
+		self.v_shader.trace_add("write", self.update_mode)
+
 		self.shader = ttk.Combobox(self, textvariable = self.v_shader, values = ["SpriteCard", "UnlitGeneric"], state = "readonly")
 		self.translucent = tk.Checkbutton(self, variable = self.v_translucent, text = "Translucent")
 		self.vertex_alpha = tk.Checkbutton(self, variable = self.v_vertex_alpha, text = "Vertex alpha")
@@ -662,6 +664,52 @@ class VMTEdit(tk.Frame):
 		self.alpha_test.pack(side = "top")
 		self.no_cull.pack(side = "top")
 		self.over_bright.pack(side = "top")
+
+		self.mode_widgets = {
+				"SpriteCard": [
+						self.translucent,
+						self.vertex_alpha,
+						self.vertex_color,
+						self.blend_frames,
+						self.depth_blend,
+						self.depth_blend_scale,
+						self.no_cull,
+						self.over_bright,
+						self.additive
+				],
+				"UnlitGeneric": [
+						self.translucent,
+						self.vertex_alpha,
+						self.vertex_color,
+						self.alpha_test,
+						self.no_cull
+				]
+		}
+		self.update_mode()
+
+
+
+	def update_mode(self, *_args):
+		mode = self.v_shader.get()
+		seen = list()
+		current = self.mode_widgets.get(mode, [])
+		for lst in self.mode_widgets.values():
+			for x in lst:
+				if x in seen: continue
+				seen.append(x)
+				self.set_color(x, "black" if x in current else "gray")
+
+
+	@staticmethod
+	def set_color(widget, fg: str):
+		if isinstance(widget, FloatField):
+			widget.label.config(fg = fg)
+		else:
+			widget.config(fg = fg)
+
+	def is_enabled(self, widget):
+		return widget in self.mode_widgets.get(self.v_shader.get(), [])
+
 
 
 class NamedEntry(tk.Frame):
