@@ -139,7 +139,7 @@ class VMT:
 				f"\t\"$vertexcolor\" \"{self.vertex_color}\"" if self.vertex_color else "",
 				f"\t\"$blendframes\" \"{self.blend_frames}\"" if self.blend_frames else "",
 				f"\t\"$depthblend\" \"{self.depth_blend}" if self.depth_blend else "",
-				f"\t\"$depthblendscale\" {self.depth_blend_scale}" if self.depth_blend_scale else "",
+				f"\t\"$depthblendscale\" {self.depth_blend_scale}" if self.depth_blend_scale == 50.0 else "",
 				f"\t\"$additive\" \"{self.additive}\"" if self.additive else "",
 				f"\t\"$alphatest\" \"{self.alpha_test}\"" if self.alpha_test else "",
 				f"\t\"$nocull\" \"{self.no_cull}\"" if self.no_cull else "",
