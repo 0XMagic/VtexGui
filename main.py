@@ -102,6 +102,7 @@ class VMT:
 			vertex_color = 0.0,
 			blend_frames = False,
 			depth_blend = False,
+			depth_blend_scale = 0.0,
 			additive = False,
 			alpha_test = False,
 			no_cull = False,
@@ -123,6 +124,7 @@ class VMT:
 		self.custom_path = custom_path
 		self.folder = custom_folder
 		self.over_bright_factor = over_bright_factor
+		self.depth_blend_scale = depth_blend_scale
 
 
 	def __str__(self):
@@ -137,6 +139,7 @@ class VMT:
 				f"\t\"$vertexcolor\" \"{self.vertex_color}\"" if self.vertex_color else "",
 				f"\t\"$blendframes\" \"{self.blend_frames}\"" if self.blend_frames else "",
 				f"\t\"$depthblend\" \"{self.depth_blend}" if self.depth_blend else "",
+				f"\t\"$depthblendscale\" {self.depth_blend_scale}" if self.depth_blend_scale else "",
 				f"\t\"$additive\" \"{self.additive}\"" if self.additive else "",
 				f"\t\"$alphatest\" \"{self.alpha_test}\"" if self.alpha_test else "",
 				f"\t\"$nocull\" \"{self.no_cull}\"" if self.no_cull else "",
@@ -568,6 +571,7 @@ class PageMain(tk.Frame):
 					over_bright_factor = self.vmt.over_bright.value,
 					vertex_alpha = self.vmt.vertex_alpha.value,
 					vertex_color = self.vmt.vertex_color.value,
+					depth_blend_scale = self.vmt.depth_blend_scale.value
 			)))
 
 		if custom_export:
@@ -639,6 +643,7 @@ class VMTEdit(tk.Frame):
 		self.vertex_color = FloatField(self, "Vertex color", default = 1.0)
 		self.blend_frames = tk.Checkbutton(self, variable = self.v_blend_frames, text = "Blend frames")
 		self.depth_blend = tk.Checkbutton(self, variable = self.v_depth_blend, text = "Depth blend")
+		self.depth_blend_scale = FloatField(self, "Depth blend scale", default = 50.0)
 		self.additive = tk.Checkbutton(self, variable = self.v_additive, text = "Additive")
 		self.alpha_test = tk.Checkbutton(self, variable = self.v_alpha_test, text = "Alpha test")
 		self.no_cull = tk.Checkbutton(self, variable = self.v_no_cull, text = "No cull")
@@ -650,6 +655,7 @@ class VMTEdit(tk.Frame):
 		self.vertex_color.pack(side = "top")
 		self.blend_frames.pack(side = "top")
 		self.depth_blend.pack(side = "top")
+		self.depth_blend_scale.pack(side = "top")
 		self.additive.pack(side = "top")
 		self.alpha_test.pack(side = "top")
 		self.no_cull.pack(side = "top")
