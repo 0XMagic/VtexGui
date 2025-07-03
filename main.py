@@ -98,8 +98,8 @@ class VMT:
 			self, material: str,
 			shader = "",
 			translucent = True,
-			vertex_alpha = True,
-			vertex_color = True,
+			vertex_alpha = 0.0,
+			vertex_color = 0.0,
 			blend_frames = False,
 			depth_blend = False,
 			additive = False,
@@ -113,8 +113,8 @@ class VMT:
 		self.shader = shader
 		self.base_texture = material
 		self.translucent = BoolKVVar(translucent)
-		self.vertex_alpha = BoolKVVar(vertex_alpha)
-		self.vertex_color = BoolKVVar(vertex_color)
+		self.vertex_alpha = vertex_alpha
+		self.vertex_color = vertex_color
 		self.blend_frames = BoolKVVar(blend_frames)
 		self.depth_blend = BoolKVVar(depth_blend)
 		self.additive = BoolKVVar(additive)
@@ -565,8 +565,9 @@ class PageMain(tk.Frame):
 					custom_folder = config.workshop_folder,
 					alpha_test = self.vmt.v_alpha_test.get(),
 					no_cull = self.vmt.v_no_cull.get(),
-					over_bright_factor = self.vmt.over_bright.value
-
+					over_bright_factor = self.vmt.over_bright.value,
+					vertex_alpha = self.vmt.vertex_alpha.value,
+					vertex_color = self.vmt.vertex_color.value,
 			)))
 
 		if custom_export:
@@ -586,9 +587,9 @@ class PageMain(tk.Frame):
 
 
 class FloatField(tk.Frame):
-	def __init__(self, master, name: str, **kwargs):
+	def __init__(self, master, name: str, default: float = 0.0, **kwargs):
 		super().__init__(master, **kwargs)
-		self._value = tk.StringVar(value = "0.0")
+		self._value = tk.StringVar(value = str(default))
 		self._value.trace_add("write", self.update_color)
 		self.entry = tk.Entry(self, textvariable = self._value, width = 5)
 		self.label = tk.Label(self, text = name)
@@ -597,7 +598,7 @@ class FloatField(tk.Frame):
 		self.entry.pack(side = "right")
 
 
-	def update_color(self, *args):
+	def update_color(self, *_args):
 		try:
 			float(self._value.get())
 			is_float = True
@@ -626,8 +627,6 @@ class VMTEdit(tk.Frame):
 
 		self.v_shader = tk.StringVar(value = "SpriteCard")
 		self.v_translucent = tk.BooleanVar(value = True)
-		self.v_vertex_alpha = tk.BooleanVar(value = True)
-		self.v_vertex_color = tk.BooleanVar(value = True)
 		self.v_blend_frames = tk.BooleanVar()
 		self.v_depth_blend = tk.BooleanVar()
 		self.v_additive = tk.BooleanVar()
@@ -636,8 +635,8 @@ class VMTEdit(tk.Frame):
 
 		self.shader = ttk.Combobox(self, textvariable = self.v_shader, values = ["SpriteCard", "UnlitGeneric"], state = "readonly")
 		self.translucent = tk.Checkbutton(self, variable = self.v_translucent, text = "Translucent")
-		self.vertex_alpha = tk.Checkbutton(self, variable = self.v_vertex_alpha, text = "Vertex alpha")
-		self.vertex_color = tk.Checkbutton(self, variable = self.v_vertex_color, text = "Vertex color")
+		self.vertex_alpha = FloatField(self, "Vertex alpha", default = 1.0)
+		self.vertex_color = FloatField(self, "Vertex color", default = 1.0)
 		self.blend_frames = tk.Checkbutton(self, variable = self.v_blend_frames, text = "Blend frames")
 		self.depth_blend = tk.Checkbutton(self, variable = self.v_depth_blend, text = "Depth blend")
 		self.additive = tk.Checkbutton(self, variable = self.v_additive, text = "Additive")
@@ -646,14 +645,14 @@ class VMTEdit(tk.Frame):
 		self.over_bright = FloatField(self, "OverBrightFactor")
 
 		self.shader.pack(side = "top")
-		self.translucent.pack(side = "top", fill = "x")
-		self.vertex_alpha.pack(side = "top", fill = "x")
-		self.vertex_color.pack(side = "top", fill = "x")
-		self.blend_frames.pack(side = "top", fill = "x")
-		self.depth_blend.pack(side = "top", fill = "x")
-		self.additive.pack(side = "top", fill = "x")
-		self.alpha_test.pack(side = "top", fill = "x")
-		self.no_cull.pack(side = "top", fill = "x")
+		self.translucent.pack(side = "top")
+		self.vertex_alpha.pack(side = "top")
+		self.vertex_color.pack(side = "top")
+		self.blend_frames.pack(side = "top")
+		self.depth_blend.pack(side = "top")
+		self.additive.pack(side = "top")
+		self.alpha_test.pack(side = "top")
+		self.no_cull.pack(side = "top")
 		self.over_bright.pack(side = "top")
 
 
