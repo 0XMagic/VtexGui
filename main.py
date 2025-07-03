@@ -561,17 +561,17 @@ class PageMain(tk.Frame):
 			fl.write(str(VMT(
 					tf2.material,
 					custom_path = custom_export,
+					custom_folder = config.workshop_folder,
 					shader = self.vmt.v_shader.get(),
 					blend_frames = self.vmt.v_blend_frames.get(),
-					depth_blend = self.vmt.v_depth_blend.get(),
-					additive = self.vmt.v_additive.get(),
-					custom_folder = config.workshop_folder,
-					alpha_test = self.vmt.v_alpha_test.get(),
-					no_cull = self.vmt.v_no_cull.get(),
-					over_bright_factor = self.vmt.over_bright.value,
-					vertex_alpha = self.vmt.v_vertex_alpha.get(),
-					vertex_color = self.vmt.v_vertex_color.get(),
-					depth_blend_scale = self.vmt.depth_blend_scale.value
+					depth_blend = self.vmt.v_depth_blend.get() if self.vmt.is_enabled(self.vmt.depth_blend) else False,
+					additive = self.vmt.v_additive.get() if self.vmt.is_enabled(self.vmt.additive) else False,
+					alpha_test = self.vmt.v_alpha_test.get() if self.vmt.is_enabled(self.vmt.alpha_test) else False,
+					no_cull = self.vmt.v_no_cull.get() if self.vmt.is_enabled(self.vmt.no_cull) else False,
+					over_bright_factor = self.vmt.over_bright.value if self.vmt.is_enabled(self.vmt.over_bright) else False,
+					vertex_alpha = self.vmt.v_vertex_alpha.get() if self.vmt.is_enabled(self.vmt.vertex_alpha) else False,
+					vertex_color = self.vmt.v_vertex_color.get() if self.vmt.is_enabled(self.vmt.vertex_color) else False,
+					depth_blend_scale = self.vmt.depth_blend_scale.value if self.vmt.is_enabled(self.vmt.depth_blend_scale) else 50.0
 			)))
 
 		if custom_export:
@@ -682,7 +682,8 @@ class VMTEdit(tk.Frame):
 						self.vertex_alpha,
 						self.vertex_color,
 						self.alpha_test,
-						self.no_cull
+						self.no_cull,
+						self.additive
 				]
 		}
 		self.update_mode()
