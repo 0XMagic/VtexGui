@@ -98,8 +98,8 @@ class VMT:
 			self, material: str,
 			shader = "",
 			translucent = True,
-			vertex_alpha = 0.0,
-			vertex_color = 0.0,
+			vertex_alpha = True,
+			vertex_color = True,
 			blend_frames = False,
 			depth_blend = False,
 			depth_blend_scale = 0.0,
@@ -114,8 +114,8 @@ class VMT:
 		self.shader = shader
 		self.base_texture = material
 		self.translucent = BoolKVVar(translucent)
-		self.vertex_alpha = vertex_alpha
-		self.vertex_color = vertex_color
+		self.vertex_alpha = BoolKVVar(vertex_alpha)
+		self.vertex_color = BoolKVVar(vertex_color)
 		self.blend_frames = BoolKVVar(blend_frames)
 		self.depth_blend = BoolKVVar(depth_blend)
 		self.additive = BoolKVVar(additive)
@@ -569,8 +569,8 @@ class PageMain(tk.Frame):
 					alpha_test = self.vmt.v_alpha_test.get(),
 					no_cull = self.vmt.v_no_cull.get(),
 					over_bright_factor = self.vmt.over_bright.value,
-					vertex_alpha = self.vmt.vertex_alpha.value,
-					vertex_color = self.vmt.vertex_color.value,
+					vertex_alpha = self.vmt.v_vertex_alpha.get(),
+					vertex_color = self.vmt.v_vertex_color.get(),
 					depth_blend_scale = self.vmt.depth_blend_scale.value
 			)))
 
@@ -631,6 +631,8 @@ class VMTEdit(tk.Frame):
 
 		self.v_shader = tk.StringVar(value = "SpriteCard")
 		self.v_translucent = tk.BooleanVar(value = True)
+		self.v_vertex_alpha = tk.BooleanVar(value = True)
+		self.v_vertex_color = tk.BooleanVar(value = True)
 		self.v_blend_frames = tk.BooleanVar()
 		self.v_depth_blend = tk.BooleanVar()
 		self.v_additive = tk.BooleanVar()
@@ -639,8 +641,8 @@ class VMTEdit(tk.Frame):
 
 		self.shader = ttk.Combobox(self, textvariable = self.v_shader, values = ["SpriteCard", "UnlitGeneric"], state = "readonly")
 		self.translucent = tk.Checkbutton(self, variable = self.v_translucent, text = "Translucent")
-		self.vertex_alpha = FloatField(self, "Vertex alpha", default = 1.0)
-		self.vertex_color = FloatField(self, "Vertex color", default = 1.0)
+		self.vertex_alpha = tk.Checkbutton(self, variable = self.v_vertex_alpha, text = "Vertex alpha")
+		self.vertex_color = tk.Checkbutton(self, variable = self.v_vertex_color, text = "Vertex color")
 		self.blend_frames = tk.Checkbutton(self, variable = self.v_blend_frames, text = "Blend frames")
 		self.depth_blend = tk.Checkbutton(self, variable = self.v_depth_blend, text = "Depth blend")
 		self.depth_blend_scale = FloatField(self, "Depth blend scale", default = 50.0)
