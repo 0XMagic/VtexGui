@@ -818,7 +818,7 @@ def launch(*paths: str):
 	vmt_edit = VMTEdit(tabs)
 	page = PageMain(tabs)
 	tabs.add(page, text = "Sequence editor")
-	tabs.add(vmt_edit, text = "Advanced options")
+	tabs.add(vmt_edit, text = "VMT options")
 	tabs.add(cfg, text = "Config")
 	page.vmt = vmt_edit
 
