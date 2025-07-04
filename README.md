@@ -1,6 +1,6 @@
 # VtexGui
-Automates the creation of vtf and vmt files from TGA images
-
+Automates the creation of vtf and vmt files from TGA images\
+(This application only works on Windows)
 
 ## User guide
 1. Install [Python 3](https://www.python.org/)
