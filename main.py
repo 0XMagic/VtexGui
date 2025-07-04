@@ -10,6 +10,7 @@ import json
 import struct
 import subprocess
 import shutil
+import platform
 
 
 class Config(dict):
@@ -835,6 +836,14 @@ def launch(*paths: str):
 
 
 def main():
+	system = platform.system()
+	if system != "Windows":
+		showerror(
+					"Unsupported OS :(",
+					f"The following OS ({system}) is not supported.\nThis program uses Windows-only features."
+		)
+		return
+
 	launch(*(sys.argv[1:] if len(sys.argv) > 1 else list()))
 
 
