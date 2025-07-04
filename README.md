@@ -15,3 +15,6 @@ Automates the creation of vtf and vmt files from TGA images\
 ## Advanced usage
 * You can drag and drop tga files onto the application file to automatically make sequences.
 * Use a "-" in the filename to denote a sequence (sorted alphabetically)
+
+## Credit
+* You **DO NOT** have to credit me or add me as a contributor to your workshop items for using this tool.
