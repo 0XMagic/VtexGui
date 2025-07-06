@@ -68,11 +68,23 @@ class Config(dict):
 
 	@property
 	def open_explorer(self):
+		self._reload()
 		return self.get("open_explorer", False)
 
 	@open_explorer.setter
 	def open_explorer(self, value: bool):
 		self["open_explorer"] = value
+		self._save()
+
+
+	@property
+	def edit_mks(self):
+		self._reload()
+		return self.get("edit_mks", False)
+
+	@edit_mks.setter
+	def edit_mks(self, value: bool):
+		self["edit_mks"] = value
 		self._save()
 
 
@@ -260,6 +272,36 @@ class DragDropListbox(tk.Listbox):
 			self.cur_index = i
 			if self.on_order_changed: self.on_order_changed()
 
+class MKSheetPopup(tk.Frame):
+	def __init__(self, master: tk.Toplevel, callback, text_variable: tk.StringVar,  **kwargs):
+		super().__init__(master, **kwargs)
+		self.window = master
+		self.field = tk.Text(self)
+		self.frame_buttons = tk.Frame(self)
+		self.btn_accept = tk.Button(self.frame_buttons, text = "Accept", bg = "lightgreen", command = self.press_accept, width = 50)
+		self.btn_decline = tk.Button(self.frame_buttons, text = "Cancel", bg = "red", command = self.press_decline, width = 50)
+
+		self.field.insert(tk.END, text_variable.get())
+		self.variable = text_variable
+		self.callback = callback
+
+		self.field.pack(side = "top", fill = "both")
+		self.frame_buttons.pack(side = "top")
+		self.btn_accept.pack(side = "right", fill = "x")
+		self.btn_decline.pack(side = "left", fill = "x")
+
+
+	def press_accept(self):
+		self.variable.set(self.field.get("1.0", 'end-1c'))
+		self.window.destroy()
+		self.callback()
+
+	def press_decline(self):
+		self.variable.set("")
+		self.window.destroy()
+		self.callback()
+
+
 
 class SequenceMenu(tk.Frame):
 	def __init__(self, master, **kwargs):
@@ -440,6 +482,8 @@ class PageMain(tk.Frame):
 		self.builder.pack(side = "top")
 		self.btn_export.pack(side = "bottom", fill = "x")
 		self.vmt: [VMTEdit, None] = None
+		self.mks_var = tk.StringVar()
+		self.popup = None
 
 	@staticmethod
 	def ask_tf_dir(config: Config):
@@ -534,10 +578,34 @@ class PageMain(tk.Frame):
 			showerror("VTF ERROR", "The following errors have occurred:\n\n" + "\n\n".join(errors))
 			return
 
+		self.mks_var.set("\n".join(mks_lines))
+		if config.edit_mks:
+			self.popup = tk.Toplevel()
+			self.popup.wm_title("MKS View")
+			self.popup.protocol("WM_DELETE_WINDOW", self.popup_close)
+			self.popup.focus_force()
+			self.popup.lift()
+			self.popup.grab_set()
+			mks_frame = MKSheetPopup(self.popup, self.output, self.mks_var)
+			mks_frame.pack()
+		else:
+			self.output()
+
+	def popup_close(self):
+		if isinstance(self.popup, tk.Toplevel):
+			self.popup.destroy()
+		self.mks_var.set("")
+
+	def output(self):
+		if not self.mks_var.get():
+			return
+
+		config = Config()
+		tf2 = TF2Output(Path(config.tf2), self.builder.v_mat_name.get(), config.workshop_folder)
 		path_mks = Path(tf2.material + ".mks")
 
 		with open(path_mks, "w") as fl:
-			fl.write("\n".join(mks_lines))
+			fl.write(self.mks_var.get())
 
 		subprocess.call(str(tf2.mks) + f" \"{path_mks}\"")
 		tf2.mkdir()
@@ -737,6 +805,7 @@ class ConfigFrame(tk.Frame):
 		super().__init__(master, **kwargs)
 		self.v_explorer = tk.BooleanVar()
 		self.v_workshop = tk.BooleanVar()
+		self.v_mks = tk.BooleanVar()
 		self.cfg = Config()
 
 		self.workshop_export = tk.Checkbutton(self, text = "Export to workshop folder", variable = self.v_workshop)
@@ -753,9 +822,13 @@ class ConfigFrame(tk.Frame):
 		self.workshop_folder = NamedEntry(self, "Workshop folder", self.cfg.workshop_folder)
 		self.workshop_folder.on_changed = self.changed_custom_folder
 
+		self.mks = tk.Checkbutton(self, text = "Edit MKS file before export", variable = self.v_mks)
+		self.v_mks.trace_add("write", self.changed_mks)
+
 		self.workshop_export.pack(side = "top")
 		self.workshop_folder.pack(side = "top")
 		self.open_explorer.pack(side = "top")
+		self.mks.pack(side = "top")
 
 	def changed_custom_dir(self, *_args):
 		self.cfg.workshop_export = self.v_workshop.get()
@@ -765,6 +838,9 @@ class ConfigFrame(tk.Frame):
 
 	def changed_custom_folder(self):
 		self.cfg.workshop_folder = self.workshop_folder.v_entry.get()
+
+	def changed_mks(self, *_args):
+		self.cfg.edit_mks = self.v_mks.get()
 
 
 class DroppedFile:
