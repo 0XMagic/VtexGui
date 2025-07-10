@@ -888,6 +888,7 @@ def launch(*paths: str):
 		showwarning("Drag-and-drop Warning", "\n".join(warning_lines))
 
 	app = tk.Tk()
+	app.wm_title("VtexGui")
 	tabs = ttk.Notebook(app)
 	tabs.pack(side = "top")
 
