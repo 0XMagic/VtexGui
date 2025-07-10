@@ -333,18 +333,18 @@ class SequenceMenu(tk.Frame):
 		self.v_looping.trace_add("write", self.update_looping)
 		self.looping = tk.Checkbutton(self.file_buttons, variable = self.v_looping, text = "Looping")
 
-		self.add = tk.Button(self.buttons, text = "Add sequence", command = self.add_sequence)
-		self.remove = tk.Button(self.buttons, text = "Delete sequence", command = self.remove_sequence)
+		self.add = tk.Button(self.buttons, text = "Add sequence", command = self.add_sequence, width = 20)
+		self.remove = tk.Button(self.buttons, text = "Delete sequence", command = self.remove_sequence, width = 20)
 
-		self.file_add = tk.Button(self.file_buttons, text = "Add images", command = self.add_file_popup)
-		self.file_remove = tk.Button(self.file_buttons, text = "Remove image", command = self.remove_image)
+		self.file_add = tk.Button(self.file_buttons, text = "Add images", command = self.add_file_popup, width = 20)
+		self.file_remove = tk.Button(self.file_buttons, text = "Remove image", command = self.remove_image, width = 20)
 
 		self.seqs_frame.pack(side = "left", anchor = "n", fill = "y")
 		self.files_frame.pack(side = "right", anchor = "n", fill = "x")
 
 		self.mat_name.pack(side = "top", fill = "x")
 		self.seq_name.pack(side = "top", fill = "x")
-		self.looping.pack(side = "top", fill = "x")
+		self.looping.pack(side = "right", fill = "x")
 		self.files.pack(side = "top")
 		self.seqs.pack(side = "top")
 		self.buttons.pack(side = "bottom")
