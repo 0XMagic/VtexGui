@@ -550,7 +550,7 @@ class PageMain(tk.Frame):
 					err_mismatch = True
 				size = tga.width
 
-		if not err_square:
+		if not err_square and not err_mismatch:
 			x = 0
 			y = 0
 
