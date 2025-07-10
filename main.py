@@ -13,6 +13,13 @@ import shutil
 import platform
 
 
+class Colors:
+	main_bg = "#676868"
+	text_fg = "white"
+	sequence_bg = "#3f3f3f"
+	button_bg = "#7a7a7a"
+
+
 class Config(dict):
 	def __init__(self):
 		self.path = Path(os.getenv('LOCALAPPDATA')) / "auto_vtex"
@@ -76,7 +83,6 @@ class Config(dict):
 		self["open_explorer"] = value
 		self._save()
 
-
 	@property
 	def edit_mks(self):
 		self._reload()
@@ -139,13 +145,12 @@ class VMT:
 		self.over_bright_factor = over_bright_factor
 		self.depth_blend_scale = depth_blend_scale
 
-
 	def __str__(self):
 		path = f"{self.base_texture}/{self.base_texture}"
 		if self.custom_path:
 			path = str(Path(self.custom_path) / f"{self.folder}/{self.base_texture}")
 
-		result = f"\"{self.shader}\" "+"{\n" + "\n".join([
+		result = f"\"{self.shader}\" " + "{\n" + "\n".join([
 				f"\t\"$basetexture\" \"{path}\"",
 				f"\t\"$translucent\" \"{self.translucent}\"" if self.translucent else "",
 				f"\t\"$vertexalpha\" \"{self.vertex_alpha}\"" if self.vertex_alpha else "",
@@ -272,14 +277,21 @@ class DragDropListbox(tk.Listbox):
 			self.cur_index = i
 			if self.on_order_changed: self.on_order_changed()
 
+
 class MKSheetPopup(tk.Frame):
-	def __init__(self, master: tk.Toplevel, callback, text_variable: tk.StringVar,  **kwargs):
+	def __init__(self, master: tk.Toplevel, callback, text_variable: tk.StringVar, **kwargs):
 		super().__init__(master, **kwargs)
 		self.window = master
 		self.field = tk.Text(self)
 		self.frame_buttons = tk.Frame(self)
-		self.btn_accept = tk.Button(self.frame_buttons, text = "Accept", bg = "lightgreen", command = self.press_accept, width = 50)
-		self.btn_decline = tk.Button(self.frame_buttons, text = "Cancel", bg = "red", command = self.press_decline, width = 50)
+		self.btn_accept = tk.Button(
+				self.frame_buttons, text = "Accept", bg = "lightgreen", command = self.press_accept,
+				width = 50
+		)
+		self.btn_decline = tk.Button(
+				self.frame_buttons, text = "Cancel", bg = "red", command = self.press_decline,
+				width = 50
+		)
 
 		self.field.insert(tk.END, text_variable.get())
 		self.variable = text_variable
@@ -289,7 +301,6 @@ class MKSheetPopup(tk.Frame):
 		self.frame_buttons.pack(side = "top")
 		self.btn_accept.pack(side = "right", fill = "x")
 		self.btn_decline.pack(side = "left", fill = "x")
-
 
 	def press_accept(self):
 		self.variable.set(self.field.get("1.0", 'end-1c'))
@@ -302,42 +313,58 @@ class MKSheetPopup(tk.Frame):
 		self.callback()
 
 
-
 class SequenceMenu(tk.Frame):
 	def __init__(self, master, **kwargs):
 		super().__init__(master, **kwargs)
 
-		self.seqs_frame = tk.Frame(self)
+		self.seqs_frame = tk.Frame(self, bg = Colors.main_bg)
 		self.v_mat_name = tk.StringVar()
 		self.v_mat_name.set("Unnamed_material")
-		self.mat_name = tk.Entry(self.seqs_frame, textvariable = self.v_mat_name)
+		self.mat_name = tk.Entry(self.seqs_frame, textvariable = self.v_mat_name, bg = Colors.main_bg, fg = Colors.text_fg)
 		self.seqs = DragDropListbox(
 				self.seqs_frame, width = 120, height = 25,
-				on_select_changed = self.seq_change_selection
+				on_select_changed = self.seq_change_selection,
+				bg = Colors.sequence_bg, fg = Colors.text_fg
 		)
-		self.files_frame = tk.Frame(self)
-		self.files_frame_top = tk.Frame(self.files_frame, width = 120)
+		self.files_frame = tk.Frame(self, bg = Colors.main_bg)
+		self.files_frame_top = tk.Frame(self.files_frame, width = 120, bg = Colors.main_bg)
 		self.files = DragDropListbox(
 				self.files_frame, width = 120, height = 25,
-				on_order_changed = self.update_files_order
+				on_order_changed = self.update_files_order,
+				bg = Colors.sequence_bg, fg = Colors.text_fg
 		)
 		self.data_paths = dict()
 		self.data_looping = dict()
 
-		self.buttons = tk.Frame(self.seqs_frame)
-		self.file_buttons = tk.Frame(self.files_frame)
+		self.buttons = tk.Frame(self.seqs_frame, bg = Colors.main_bg)
+		self.file_buttons = tk.Frame(self.files_frame, bg = Colors.main_bg)
 		self.v_seq_name = tk.StringVar()
 		self.v_seq_name.trace_add("write", self.edit_sequence_name)
-		self.seq_name = tk.Entry(self.files_frame, textvariable = self.v_seq_name)
+		self.seq_name = tk.Entry(self.files_frame, textvariable = self.v_seq_name, bg = Colors.main_bg, fg = Colors.text_fg)
 		self.v_looping = tk.BooleanVar(value = True)
 		self.v_looping.trace_add("write", self.update_looping)
-		self.looping = tk.Checkbutton(self.file_buttons, variable = self.v_looping, text = "Looping")
+		self.looping = tk.Checkbutton(
+				self.file_buttons, variable = self.v_looping, text = "Looping",
+				bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
 
-		self.add = tk.Button(self.buttons, text = "Add sequence", command = self.add_sequence, width = 20)
-		self.remove = tk.Button(self.buttons, text = "Delete sequence", command = self.remove_sequence, width = 20)
+		self.add = tk.Button(
+				self.buttons, text = "Add sequence", command = self.add_sequence, width = 20,
+				bg = Colors.button_bg, fg = Colors.text_fg
+		)
+		self.remove = tk.Button(
+				self.buttons, text = "Delete sequence", command = self.remove_sequence, width = 20,
+				bg = Colors.button_bg, fg = Colors.text_fg
+		)
 
-		self.file_add = tk.Button(self.file_buttons, text = "Add images", command = self.add_file_popup, width = 20)
-		self.file_remove = tk.Button(self.file_buttons, text = "Remove image", command = self.remove_image, width = 20)
+		self.file_add = tk.Button(
+				self.file_buttons, text = "Add images", command = self.add_file_popup, width = 20,
+				bg = Colors.button_bg, fg = Colors.text_fg
+		)
+		self.file_remove = tk.Button(
+				self.file_buttons, text = "Remove image", command = self.remove_image, width = 20,
+				bg = Colors.button_bg, fg = Colors.text_fg
+		)
 
 		self.seqs_frame.pack(side = "left", anchor = "n", fill = "y")
 		self.files_frame.pack(side = "right", anchor = "n", fill = "x")
@@ -474,7 +501,7 @@ class PageMain(tk.Frame):
 	def __init__(self, master, **kwargs):
 		super().__init__(master, **kwargs)
 
-		self.builder = SequenceMenu(self, pady = 5)
+		self.builder = SequenceMenu(self, pady = 5, bg = Colors.main_bg)
 		self.btn_export = tk.Button(
 				self, text = "MAKE VTF", bg = "lightgreen", activebackground = "green", height = 2,
 				font = 24, command = self.export
@@ -658,18 +685,17 @@ class PageMain(tk.Frame):
 			os.startfile(tf2.final if not custom_export else tf2.alternate_final)
 
 
-
 class FloatField(tk.Frame):
 	def __init__(self, master, name: str, default: float = 0.0, **kwargs):
 		super().__init__(master, **kwargs)
 		self._value = tk.StringVar(value = str(default))
 		self._value.trace_add("write", self.update_color)
-		self.entry = tk.Entry(self, textvariable = self._value, width = 5)
-		self.label = tk.Label(self, text = name)
+		self.entry = tk.Entry(self, textvariable = self._value, width = 15, bg = Colors.sequence_bg)
+		self.label = tk.Label(self, text = name, bg = Colors.main_bg)
 
 		self.label.pack(side = "left")
 		self.entry.pack(side = "right")
-
+		self.update_color()
 
 	def update_color(self, *_args):
 		try:
@@ -679,12 +705,9 @@ class FloatField(tk.Frame):
 			is_float = False
 
 		if is_float:
-			self.entry.config(fg = "black")
+			self.entry.config(fg = Colors.text_fg)
 		else:
 			self.entry.config(fg = "red")
-
-
-
 
 	@property
 	def value(self):
@@ -710,17 +733,40 @@ class VMTEdit(tk.Frame):
 
 		self.v_shader.trace_add("write", self.update_mode)
 
-		self.shader = ttk.Combobox(self, textvariable = self.v_shader, values = ["SpriteCard", "UnlitGeneric"], state = "readonly")
-		self.translucent = tk.Checkbutton(self, variable = self.v_translucent, text = "Translucent")
-		self.vertex_alpha = tk.Checkbutton(self, variable = self.v_vertex_alpha, text = "Vertex alpha")
-		self.vertex_color = tk.Checkbutton(self, variable = self.v_vertex_color, text = "Vertex color")
-		self.blend_frames = tk.Checkbutton(self, variable = self.v_blend_frames, text = "Blend frames")
-		self.depth_blend = tk.Checkbutton(self, variable = self.v_depth_blend, text = "Depth blend")
-		self.depth_blend_scale = FloatField(self, "Depth blend scale", default = 50.0)
-		self.additive = tk.Checkbutton(self, variable = self.v_additive, text = "Additive")
-		self.alpha_test = tk.Checkbutton(self, variable = self.v_alpha_test, text = "Alpha test")
-		self.no_cull = tk.Checkbutton(self, variable = self.v_no_cull, text = "No cull")
-		self.over_bright = FloatField(self, "OverBrightFactor")
+		self.shader = ttk.Combobox(
+				self, textvariable = self.v_shader, values = ["SpriteCard", "UnlitGeneric"],
+				state = "readonly"
+		)
+		self.translucent = tk.Checkbutton(
+				self, variable = self.v_translucent, text = "Translucent", bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
+		self.vertex_alpha = tk.Checkbutton(
+				self, variable = self.v_vertex_alpha, text = "Vertex alpha", bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
+		self.vertex_color = tk.Checkbutton(
+				self, variable = self.v_vertex_color, text = "Vertex color", bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
+		self.blend_frames = tk.Checkbutton(
+				self, variable = self.v_blend_frames, text = "Blend frames", bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
+		self.depth_blend = tk.Checkbutton(
+				self, variable = self.v_depth_blend, text = "Depth blend", bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
+		self.depth_blend_scale = FloatField(
+				self, "Depth blend scale", default = 50.0
+		)
+		self.additive = tk.Checkbutton(
+				self, variable = self.v_additive, text = "Additive", bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
+		self.alpha_test = tk.Checkbutton(
+				self, variable = self.v_alpha_test, text = "Alpha test", bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
+		self.no_cull = tk.Checkbutton(
+				self, variable = self.v_no_cull, text = "No cull", bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
+		self.over_bright = FloatField(
+				self, "OverBrightFactor"
+		)
 
 		self.shader.pack(side = "top")
 		self.translucent.pack(side = "top")
@@ -735,7 +781,7 @@ class VMTEdit(tk.Frame):
 		self.over_bright.pack(side = "top")
 
 		self.mode_widgets = {
-				"SpriteCard": [
+				"SpriteCard":   [
 						self.translucent,
 						self.vertex_alpha,
 						self.vertex_color,
@@ -757,8 +803,6 @@ class VMTEdit(tk.Frame):
 		}
 		self.update_mode()
 
-
-
 	def update_mode(self, *_args):
 		mode = self.v_shader.get()
 		seen = list()
@@ -767,8 +811,7 @@ class VMTEdit(tk.Frame):
 			for x in lst:
 				if x in seen: continue
 				seen.append(x)
-				self.set_color(x, "black" if x in current else "gray")
-
+				self.set_color(x, Colors.text_fg if x in current else "gray")
 
 	@staticmethod
 	def set_color(widget, fg: str):
@@ -781,14 +824,13 @@ class VMTEdit(tk.Frame):
 		return widget in self.mode_widgets.get(self.v_shader.get(), [])
 
 
-
 class NamedEntry(tk.Frame):
 	def __init__(self, master, name: str, default_value: str, **kwargs):
 		super().__init__(master, **kwargs)
 		self.on_changed = None
 		self.v_entry = tk.StringVar(value = default_value)
-		self.label = tk.Label(self, text = name)
-		self.entry = tk.Entry(self, textvariable = self.v_entry)
+		self.label = tk.Label(self, text = name, bg = Colors.main_bg, fg = Colors.text_fg)
+		self.entry = tk.Entry(self, textvariable = self.v_entry, width = 40, bg = Colors.sequence_bg, fg = Colors.text_fg)
 
 		self.label.pack(side = "left")
 		self.entry.pack(side = "right", fill = "x")
@@ -808,13 +850,17 @@ class ConfigFrame(tk.Frame):
 		self.v_mks = tk.BooleanVar()
 		self.cfg = Config()
 
-		self.workshop_export = tk.Checkbutton(self, text = "Export to workshop folder", variable = self.v_workshop)
+		self.workshop_export = tk.Checkbutton(
+				self, text = "Export to workshop folder",
+				variable = self.v_workshop, bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
 		self.v_workshop.set(self.cfg.workshop_export)
 		self.v_workshop.trace_add("write", self.changed_custom_dir)
 
 		self.open_explorer = tk.Checkbutton(
 				self, text = "Open explorer to exported material",
-				variable = self.v_explorer
+				variable = self.v_explorer,
+				bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
 		)
 		self.v_explorer.set(self.cfg.open_explorer)
 		self.v_explorer.trace_add("write", self.changed_open_explorer)
@@ -822,7 +868,10 @@ class ConfigFrame(tk.Frame):
 		self.workshop_folder = NamedEntry(self, "Workshop folder", self.cfg.workshop_folder)
 		self.workshop_folder.on_changed = self.changed_custom_folder
 
-		self.mks = tk.Checkbutton(self, text = "Edit MKS file before export", variable = self.v_mks)
+		self.mks = tk.Checkbutton(
+				self, text = "Edit MKS file before export", variable = self.v_mks,
+				bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
+		)
 		self.v_mks.trace_add("write", self.changed_mks)
 
 		self.workshop_export.pack(side = "top")
@@ -899,6 +948,9 @@ def launch(*paths: str):
 	tabs.add(vmt_edit, text = "VMT options")
 	tabs.add(cfg, text = "Config")
 	page.vmt = vmt_edit
+	cfg.config(bg = Colors.main_bg)
+	vmt_edit.config(bg = Colors.main_bg)
+	page.config(bg = Colors.main_bg)
 
 	if dropped_files:
 		for category, path_list in dropped_files.items():
@@ -916,8 +968,8 @@ def main():
 	system = platform.system()
 	if system != "Windows":
 		showerror(
-					"Unsupported OS :(",
-					f"The following OS ({system}) is not supported.\nThis program uses Windows-only features."
+				"Unsupported OS :(",
+				f"The following OS ({system}) is not supported.\nThis program uses Windows-only features."
 		)
 		return
 
