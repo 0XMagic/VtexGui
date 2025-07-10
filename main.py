@@ -872,6 +872,7 @@ class ConfigFrame(tk.Frame):
 				self, text = "Edit MKS file before export", variable = self.v_mks,
 				bg = Colors.main_bg, fg = Colors.text_fg, selectcolor = Colors.main_bg
 		)
+		self.v_mks.set(self.cfg.edit_mks)
 		self.v_mks.trace_add("write", self.changed_mks)
 
 		self.workshop_export.pack(side = "top")
