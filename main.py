@@ -282,7 +282,7 @@ class MKSheetPopup(tk.Frame):
 	def __init__(self, master: tk.Toplevel, callback, text_variable: tk.StringVar, **kwargs):
 		super().__init__(master, **kwargs)
 		self.window = master
-		self.field = tk.Text(self)
+		self.field = tk.Text(self, bg = Colors.sequence_bg, fg = Colors.text_fg)
 		self.frame_buttons = tk.Frame(self)
 		self.btn_accept = tk.Button(
 				self.frame_buttons, text = "Accept", bg = "lightgreen", command = self.press_accept,
