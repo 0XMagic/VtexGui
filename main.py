@@ -600,6 +600,8 @@ class PageMain(tk.Frame):
 
 			for path in sequence:
 				mks_lines.append(f"frame {path} 1")
+				if " " in path:
+					errors.append(f"Filepath contains a space (mksheet cannot parse this):\n\"{path}\"")
 
 		if errors:
 			showerror("VTF ERROR", "The following errors have occurred:\n\n" + "\n\n".join(errors))
